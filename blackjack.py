@@ -23,6 +23,7 @@ __status__ = "Educational"
 class Game():
     table= None
     restock_count= 50
+    dealer_delay= 1
     shuffle_list= ['riffle','riffle','box','riffle','cut']
     action_map = {
         'H':'hit',
@@ -119,7 +120,6 @@ class Game():
 
     def colllect_insurance_bets(self):
         if self.table.offer_insurance:
-            print('COLLECT INS!')
             for bet in self.table.get_bets():
                 if bet.insurance:
                     bet.surrender_insurance()
@@ -160,7 +160,7 @@ class Game():
         dealers_hand = self.table.get_dealers_hand()
         dealers_hand.cards[0].flip()
         self.display()
-        sleep(1)
+        sleep(self.dealer_delay)
 
         if len(self.table.get_open_bets()):
             while True:
@@ -168,7 +168,7 @@ class Game():
                 if dealers_hand.value < self.table.dealer_stands_on:
                     self.table.hit(dealers_hand)
                     self.display()
-                    sleep(1)
+                    sleep(self.dealer_delay)
                 else:
                     break
         return dealers_hand
@@ -227,8 +227,7 @@ class Game():
 
         if len(self.table.CARDS['stock']) <= self.restock_count:
             self.shuffle()
-        print()
-
+        
         #place bets
         self.place_bets()
 

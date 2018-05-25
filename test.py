@@ -29,7 +29,6 @@ class Strategy():
     def __init__(self, strategy='advanced'):
         self.matrix = self.get_strategy(strategy)
 
-
     def action(self, hand, d_hand):
         if hand.value == 21:
             return 'stand'
@@ -91,14 +90,10 @@ class Strategy():
         }
         return stragegies[key]
 
-# table = BlackJack()
-
-# seat = itter(table.get_free_seats())
-
-
 class AutoGame(Game):
 
     strategy = None
+    dealer_delay = 0
 
     def __init__(self, strategy="advanced"):
         self.strategy = Strategy(strategy)
@@ -108,12 +103,12 @@ class AutoGame(Game):
         return 20
 
     def insurance_input(self, msg):
-        print('hi')
         return 'n'
 
     def action_input(self, bet, actions):
-        return self.strategy.action(bet.hand, self.table.get_dealers_hand())
+        action = self.strategy.action(bet.hand, self.table.get_dealers_hand())
+        return action if {action}.issubset(actions) else 'hit'
 
 game = AutoGame()
-for _ in range(2):
+for _ in range(100):
     game.game_loop()

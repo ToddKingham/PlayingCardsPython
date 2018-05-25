@@ -157,7 +157,6 @@ class BlackJack(PlayingCards):
         ### SPLIT
         elif action == 'split':
             #deal a new empty hand into the game.
-            print('SPLIT')
             new_bet = Bet(bet.seat, bet.amount)
             self.bets.insert(self.bets.index(bet)+1, new_bet )
             bet.seat.place_bet(new_bet)
