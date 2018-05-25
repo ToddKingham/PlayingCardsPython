@@ -193,6 +193,9 @@ class BlackJack(PlayingCards):
     def get_dealers_hand(self):
         return self.get_dealer().bets[0].hand
 
+    def get_dealers_upcard(self):
+        return list(filter(lambda c:c.upcard , self.get_dealers_hand().cards))[0]
+
     def get_seats(self):
         return list(filter(lambda s:s!=None and s.player.name!=self.house_name, [seat for seat in self.seats]))
 

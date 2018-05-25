@@ -24,12 +24,21 @@ class Game():
     table= None
     restock_count= 50
     shuffle_list= ['riffle','riffle','box','riffle','cut']
+    action_map = {
+        'H':'hit',
+        'S':'stand',
+        'D':'double',
+        'P':'split',
+        'X':'surrender',
+    }
 
     def __init__(self):
         self.table = BlackJack()
         #self.table.get_free_seats() #<=== get an array of free seat indecies to use in .add_player()
-        self.table.add_player(Player('Player 1',100),1)
-        self.table.add_player(Player('Player 2',100),2)
+        self.table.add_player(Player('Player 1',1000),1)
+        # self.table.add_player(Player('Player 2',1000),2)
+        # self.table.add_player(Player('Player 3',1000),3)
+        # self.table.add_player(Player('Player 4',1000),4)
         self.table.shuffle(['wash']+self.shuffle_list)
         #self.table.burn(24)
 
@@ -74,7 +83,7 @@ class Game():
             while not bet_placed:
                 bet_placed = self.table.place_bet(
                     seat,
-                    input(f"{seat.player.name}: Enter a bet between {str(self.table.min_bet)} and {str(min(seat.player.chips,self.table.max_bet))} (enter 0 to pass) ")
+                    self.bet_input(f"{seat.player.name}: Enter a bet between {str(self.table.min_bet)} and {str(min(seat.player.chips,self.table.max_bet))} (enter 0 to pass) ")
                 )
 
     def deal_cards(self):
@@ -84,7 +93,7 @@ class Game():
     def insurance_check(self):
         if self.table.offer_insurance:
             for bet in self.table.get_bets():
-                if input(f"{bet.seat.player.name}: would you like insurance? (y/n): ")[0].lower() == 'y':
+                if self.insurance_input(bet):
                     bet.take_insurance()
             self.display()
     
@@ -124,24 +133,6 @@ class Game():
             self.display()
 
     def betting_loop(self):
-        def msg(act):
-            msg = f"{bet.seat.player.name}: Hit(h) | Stand(s) "
-            if {'split'}.issubset(act):
-                msg += '| Split(p) '
-            if {'double'}.issubset(act):
-                msg += '| Double Down(d) '
-            if {'surrender'}.issubset(act):
-                msg += '| Surrender(x) '
-            return msg
-        
-        action_map = {
-            'H':'hit',
-            'S':'stand',
-            'D':'double',
-            'P':'split',
-            'X':'surrender',
-        }
-        
         for bet in self.table.bets:
             if bet.seat.player.name != self.table.house_name and not bet.hand.folded:
 
@@ -158,7 +149,7 @@ class Game():
                     authorized_actions = self.table.valid_actions(bet)
 
                     #let the player enter their desired action
-                    action = action_map.get(input(msg(authorized_actions))[0].upper()) 
+                    action = self.action_input(bet, authorized_actions)
 
                     #validate the action is supported then process the action
                     if {action}.issubset(authorized_actions):
@@ -212,6 +203,25 @@ class Game():
     def shuffle(self):
         self.table.restock(self.shuffle_list)
 
+    def bet_input(self, msg):
+        return input(msg)
+    
+    def insurance_input(self, bet):
+            input(f"{bet.seat.player.name}: would you like insurance? (y/n): ")[0].lower() == 'y'
+
+    def action_input(self, bet, actions):
+        def msg(act):
+            msg = f"{bet.seat.player.name}: Hit(h) | Stand(s) "
+            if {'split'}.issubset(act):
+                msg += '| Split(p) '
+            if {'double'}.issubset(act):
+                msg += '| Double Down(d) '
+            if {'surrender'}.issubset(act):
+                msg += '| Surrender(x) '
+            return msg
+
+        return self.action_map.get(input(msg(actions))[0].upper())
+
     def game_loop(self):
         os.system('clear')
 
@@ -253,12 +263,3 @@ class Game():
         self.payout_bets(dealers_hand)
 
         return
-
-the_game = Game()
-
-play = True
-while play:
-    the_game.game_loop()
-    play = input('play another round? (y/n): ')[0].lower() == 'y'
-
-print('THANKS FOR PLAYING :)')
