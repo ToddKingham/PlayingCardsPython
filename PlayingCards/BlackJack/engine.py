@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 
-''' Provides a BlackJack class. This module provides methods to manage all game mechanics of a Blackjack game
+'''
+    Provides a BlackJack class. This module provides methods
+    to manage all game mechanics of a Blackjack game
 '''
 
-from ..PlayingCards import PlayingCards
+from ..playing_cards import PlayingCards
 from itertools import chain
 
-from .Seat import Seat
-from .Player import Player
-from .Bet import Bet
-from .Hand import Hand
+from .seat import Seat
+from .player import Player
+from .bet import Bet
+from .hand import Hand
 
 __author__ = "Todd Kingham"
 __copyright__ = "Copyright 2018, Python Learning Project"
@@ -21,7 +23,7 @@ __email__ = "toddkingham@gmail.com"
 __status__ = "Educational"
 
 
-class BlackJack(PlayingCards):
+class BlackJackEngine(PlayingCards):
     seats= []
     bets= []
     min_bet= 0
@@ -48,7 +50,7 @@ class BlackJack(PlayingCards):
         bjp = list(map(int,blackjack_pays.split(':')))
         self.blackjack_pays = bjp[0]/bjp[1]
         
-        PlayingCards.__init__(self, {'packs':self.shoe})
+        PlayingCards.__init__(self, {'packs':self.shoe, 'jokers':False})
         PlayingCards.end(self)
         self.add_player(Player(self.house_name, self.bank), 0)
 

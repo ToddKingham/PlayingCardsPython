@@ -57,15 +57,43 @@ class Card():
     symbol= ""
     upcard= ""
     
-    def __init__(self, **kwargs):
-        self.index = kwargs['index']
-        self.name = kwargs['name']
-        self.kind = kwargs['kind']
-        self.suit = kwargs['suit']
-        self.color = kwargs['color']
-        self.symbol = kwargs['symbol']
-        self.upcard = kwargs['upcard']
-        
+    def __init__(self, index, suit, upcard=False):
+        deets = self.mappings(index, suit)
+        self.index = index
+        self.suit = suit
+        self.upcard = upcard
+        self.name = deets['name']
+        self.kind = deets['kind']
+        self.color = deets['color']
+        self.symbol = deets['symbol']
+
+    def mappings(self, index, suit):
+        maps = {
+            'A': {'name':'Ace', 'kind':'pip'},
+            '2': {'name':'Two', 'kind':'pip'},
+            '3': {'name':'Three', 'kind':'pip'},
+            '4': {'name':'Four', 'kind':'pip'},
+            '5': {'name':'Five', 'kind':'pip'},
+            '6': {'name':'Six', 'kind':'pip'},
+            '7': {'name':'Seven', 'kind':'pip'},
+            '8': {'name':'Eight', 'kind':'pip'},
+            '9': {'name':'Nine', 'kind':'pip'},
+            '10': {'name':'Ten', 'kind':'pip'},
+            'J': {'name':'Jack', 'kind':'face'},
+            'Q': {'name':'Queen', 'kind':'face'},
+            'K': {'name':'King', 'kind':'face'},
+            '%':{'name':'Joker', 'kind':'wild'},
+            'Hearts': {'color':'red', 'symbol':'&#9825'},
+            'Clubs': {'color':'black', 'symbol':'&#9831'},
+            'Diamonds': {'color':'red', 'symbol':'&#9826'},
+            'Spades': {'color':'black', 'symbol':'&#9828'},
+            'Big': {'color':'black', 'symbol':'&#9787'},
+            'Little': {'color':'red', 'symbol':'&#9786'}
+        }
+        result = maps[index].copy()
+        result.update(maps[suit].copy())
+        return result
+    
     def __str__(self):
         return f"{{ index:{self.index}, name:{self.name}, kind:{self.kind}, suit:{self.suit}, color:{self.color}, symbol:{self.symbol}, upcard:{self.upcard} }}"
 
@@ -77,23 +105,19 @@ class Card():
 
 class PlayingCards():
     params = {
-        "jokers" : False,
+        "jokers" : True,
         "packs" : 1,
         "discard_up" : False,
-        "cards" : {
-            "standard" : {
-                "indecies" : ('A','2','3','4','5','6','7','8','9','10','J','Q','K'),
-                "suits" : ('Spades','Diamonds','Clubs','Hearts')
+        "cards" : [
+            {
+                "index" : ('A','2','3','4','5','6','7','8','9','10','J','Q','K'),
+                "suit" : ('Hearts','Clubs','Diamonds:Desc','Spades:Desc')
             },
-            "wild" : {
-                "indecies" : ('%'),
-                "suits" : ('Little','Big')
+            {
+                'index':('%'),
+                'suit':('Little','Big')
             }
-        },
-        "exclude" : {
-            "cards" : (),
-            "suits" : ()
-        }
+        ]
     }
     
     CARDS = None
@@ -114,76 +138,17 @@ class PlayingCards():
             except:
                 pass
         
-        def new_deck():
-            result = []
-            base_kinds = ['wild', 'standard']
-            details = {
-                'standard': {
-                    'card': {
-                        'A': {'name':'Ace', 'kind':'pip'},
-                        '2': {'name':'Two', 'kind':'pip'},
-                        '3': {'name':'Three', 'kind':'pip'},
-                        '4': {'name':'Four', 'kind':'pip'},
-                        '5': {'name':'Five', 'kind':'pip'},
-                        '6': {'name':'Six', 'kind':'pip'},
-                        '7': {'name':'Seven', 'kind':'pip'},
-                        '8': {'name':'Eight', 'kind':'pip'},
-                        '9': {'name':'Nine', 'kind':'pip'},
-                        '10': {'name':'Ten', 'kind':'pip'},
-                        'J': {'name':'Jack', 'kind':'face'},
-                        'Q': {'name':'Queen', 'kind':'face'},
-                        'K': {'name':'King', 'kind':'face'},
-                    },
-                    'suit': {
-                        'spades': {'color':'black', 'symbol':'&#9828'},
-                        'clubs': {'color':'black', 'symbol':'&#9831'},
-                        'hearts': {'color':'red', 'symbol':'&#9825'},
-                        'diamonds': {'color':'red', 'symbol':'&#9826'}
-                    }
-                },
-                'wild': {
-                    'card': {
-                        '%':{'name':'Joker', 'kind':'wild'},
-                    },
-                    'suit': {
-                        'big': {'color':'Black', 'symbol':'&#9787'},
-                        'little': {'color':'Red', 'symbol':'&#9786'},
-                    }
-                }
-            }
-            
-            def build_deck(kind):
-                result = []
-                for suit in [x.lower() for x in self.params['cards'][kind]['suits']]:
-                    suit_array = []
-                    for index in [x.upper() for x in self.params['cards'][kind]['indecies']]:
-                        suit_array.append(Card(
-                            index = index.upper(),
-                            suit = suit,
-                            name = details[kind]['card'][index]['name'],
-                            kind = details[kind]['card'][index]['kind'],
-                            color = details[kind]['suit'][suit]['color'],
-                            symbol = details[kind]['suit'][suit]['symbol'],
-                            upcard = False
-                        ))
-                    if self.params['cards'][kind]['suits'].index(suit.title()) >= 2:
-                        suit_array.reverse()    
-                    result+=suit_array
-                    
-                return result
-            
-            if not self.params['jokers']:
-                base_kinds.remove('wild')
-                
-            for _ in range(self.params['packs']):
-                for kind in base_kinds:
-                    result.extend(build_deck(kind))
-            
-            result.reverse()
-            return result
-
         if deck is None:
-            self.CARDS['stock'] = new_deck()
+            if not self.params['jokers'] and len(self.params['cards']) == 2:
+                self.params['cards'].pop()
+
+            for _ in range(self.params['packs']):
+                for cardset in self.params['cards']:
+                    for s in cardset['suit']:
+                        suit = s.split(':')
+                        indecies = list(cardset['index'])
+                        if len(suit)==2 and suit[1]=='Desc': indecies.reverse()
+                        self.CARDS['stock'] += list(map(lambda i: Card(i, suit[0]), indecies))
         else:
             self.CARDS = deck
             
@@ -255,6 +220,14 @@ class PlayingCards():
     def fold(self, idx):
         Helpers().move(self.CARDS['hands'][idx], self.CARDS['discard'])
     
+    def flip(self, pile, index=0):
+        if pile == 'hands':
+            pile = self.CARDS['hands'][index]
+        else:
+            pile = self.CARDS[pile] 
+        pile.reverse()
+        list(map(lambda card:card.flip(), pile))
+    
     def give(self, src_idx, dest_idx, cards, face_up=False):
         Helpers().move(
             self.CARDS['hands'][src_idx],
@@ -286,3 +259,4 @@ class PlayingCards():
         
         if restock:
             self.restock(shuf)
+
