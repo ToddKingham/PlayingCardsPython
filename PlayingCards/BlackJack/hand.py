@@ -12,7 +12,7 @@ __maintainer__ = "Todd Kingham"
 __email__ = "toddkingham@gmail.com"
 __status__ = "Educational"
 
-class Hand():
+class Hand:
     cards= []
     bet= 0
     folded= False

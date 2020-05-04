@@ -1,17 +1,33 @@
-from PlayingCards.PlayingCards import PlayingCards
+from PlayingCards.playing_cards import PlayingCards
 
-deck = PlayingCards({'jokers':False})
-deck.deal(2, 2)
 
-hand = deck.CARDS['hands'][1]
 
-def show():
+
+
+
+
+
+def main():
+
+    decks = input("How many decks would you like to use? ")
+    jokers = True if input("Include Jokers? (y/n) ")[0].lower() === 'y' else False"["
+
+    print("Thank you! We will now build your deck.")
+    hands = input("How many hands would you like to deal? ")
+    cards = input("And finally... How many cards per hand? ")
+
+    deck = PlayingCards({'jokers': False})
+    deck.deal(, 2)
+
+
+
     for card in hand:
         print(card)
-
-
-show()
 
 #deck.draw(0)
 
 #show()
+
+
+if __name__ == "__main__":
+    main()

@@ -10,8 +10,8 @@ This file is the game entry point
 import os
 from time import sleep
 
-from .engine import BlackJackEngine
-from .player import Player
+from PlayingCards.BlackJack.engine import BlackJackEngine
+from PlayingCards.BlackJack.player import Player
 
 __author__ = "Todd Kingham"
 __copyright__ = "Copyright 2018, Python Learning Project"
@@ -23,7 +23,7 @@ __email__ = "toddkingham@gmail.com"
 __status__ = "Educational"
 
 
-class Game():
+class Game:
     table = None
     restock_count = 50
     dealer_delay = 1
@@ -87,13 +87,12 @@ class Game():
         for seat in self.table.get_seats():
             bet_placed = False
             while not bet_placed:
-                nm = seat.player.name
-                mnb = self.table.min_bet
-                mxb = self.table.max_bet
-                ch = seat.player.chips
+                mn = str(self.table.min_bet)
+                mx = str(min(seat.player.chips, self.table.max_bet))
+                inpt = f"{seat.player.name}: Enter a bet between {mn} and {mx}"
                 bet_placed = self.table.place_bet(
                     seat,
-                    self.bet_input(f"{nm}: Enter a bet between {str(mnb)} and {str(min(ch, mxb))} (enter 0 to pass) ")
+                    self.bet_input(inpt + " (enter 0 to pass) ")
                 )
 
     def deal_cards(self):
@@ -276,4 +275,5 @@ class Game():
 
         # LOOP remaining bets
         self.payout_bets(dealers_hand)
+
         return

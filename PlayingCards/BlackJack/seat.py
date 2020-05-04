@@ -12,25 +12,26 @@ __maintainer__ = "Todd Kingham"
 __email__ = "toddkingham@gmail.com"
 __status__ = "Educational"
 
+
 class Seat():
-    player= None
-    bets= None
-    
+    player = None
+    bets = None
+
     def __init__(self, player):
         self.player = player
         self.bets = []
-    
+
     def place_bet(self, bet):
         self.bets.append(bet)
-    
+
     def clear_bet(self, bet=None):
-        if bet==None:
+        if bet is None:
             self.bets = []
         else:
             del self.bets[self.bets.index(bet)]
-        
+
     def __str__(self):
         return str({
             'player': str(self.player),
-            'bets':[','.join([str(bet) for bet in self.bets])]
+            'bets': [','.join([str(bet) for bet in self.bets])]
         })

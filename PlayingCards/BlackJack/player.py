@@ -12,16 +12,17 @@ __maintainer__ = "Todd Kingham"
 __email__ = "toddkingham@gmail.com"
 __status__ = "Educational"
 
-class Player():
-    name= ''
-    chips= 0
-    
+
+class Player:
+    name = ''
+    chips = 0
+
     def __init__(self, name, chips=100):
         self.name = name
         self.chips = chips
-        
+
     def __str__(self):
         return str({
-            'name':self.name,
-            'chips':self.chips
+            'name': self.name,
+            'chips': self.chips
         })
